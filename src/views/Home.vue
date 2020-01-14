@@ -1,8 +1,6 @@
 <template>
   <div class="home">
-    <v-header title="首页" isArrow="true">
-      <i class="iconfont icon-backarrow"></i>
-    </v-header>
+    <v-header title="首页" isArrow="true"></v-header>
   </div>
 </template>
 
