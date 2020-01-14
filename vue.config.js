@@ -17,10 +17,10 @@ module.exports = {
                     require("postcss-px-to-viewport")({
                         // 需要转换的单位，默认为"px"
                         unitToConvert: 'px',
-                        // 设计稿的视口宽度, 将根据视口做比例换算
-                        viewportWidth: 750,
+                        // 设计稿的视口宽度, 将根据视口做比例换算，为兼容第三方ui组件库这里写375
+                        viewportWidth: 375,
                         // 视窗的高度，根据750设备的宽度来指定，一般指定1334，也可以不配置
-                        viewportHeight: 1334,
+                        // viewportHeight: 1334,
                         // 转化精度，转换后保留位数
                         unitPrecision: 3,
                         // 能转化为vw的属性列表

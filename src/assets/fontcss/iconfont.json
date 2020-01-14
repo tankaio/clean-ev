@@ -1,0 +1,30 @@
+{
+  "id": "1611263",
+  "name": "clean-ev",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1609506",
+      "name": "记住密码",
+      "font_class": "checked",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "4248778",
+      "name": "返回箭头",
+      "font_class": "backarrow",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "8513681",
+      "name": "记住密码",
+      "font_class": "jizhumima",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    }
+  ]
+}
