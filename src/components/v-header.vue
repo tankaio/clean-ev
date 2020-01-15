@@ -1,11 +1,11 @@
 <template>
   <div class="v-header">
-    <div class="leftwarp" @click="leftClick">
+    <div class="leftwarp" @click="leftClick" :urlLeft="urlLeft">
       <i class="iconfont icon-backarrow" v-if="isArrow"></i>
-      <span v-else>{{leftTxt}}</span>
+      <span v-else>{{ leftTxt }}</span>
     </div>
-    <div>{{title}}</div>
-    <div class="rightwrap" @click="rightClick">
+    <div>{{ title }}</div>
+    <div class="rightwrap" @click="rightClick" :urlRight="urlRight">
       <slot></slot>
     </div>
   </div>
@@ -20,11 +20,16 @@ export default {
       required: true
     },
     leftTxt: String,
-    isArrow: Boolean
+    isArrow: Boolean,
+    urlLeft: String,
+    urlRight: String
   },
   methods: {
     leftClick() {
-      
+      this.urlLeft ? this.$router.push(this.urlLeft) : this.$router.go(-1);
+    },
+    rightClick() {
+      this.urlRight ? this.$router.push(this.urlRight) : this.$router.go(-1);
     }
   }
 };

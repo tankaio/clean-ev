@@ -2,7 +2,7 @@
   <!-- eslint-disable  -->
   <div class="login">
     <!-- title -->
-    <h3 class="title">欢迎登陆宝洁SFA系统</h3>
+    <h3 class="title">欢迎登录宝洁SFA系统</h3>
     <div class="hat"></div>
     <div class="login-warp">
       <!-- logo -->
@@ -14,15 +14,36 @@
         :class="{active:isValiComId,error:inpIndex==1&&!isValiComId}"
       >
         <label>公司编号：</label>
-        <input type="text" v-model="comId" placeholder="4~6位数字" @blur="valiComId" @input="valiComId"/>
+        <input
+          type="text"
+          v-model="comId"
+          placeholder="4~6位数字"
+          @blur="valiComId"
+          @input="valiComId"
+        />
       </div>
-      <div class="input-group mt" @click="inpIndex=2" :class="{active:inpIndex==2}">
+      <div
+        class="input-group mt"
+        @click="inpIndex=2"
+        :class="{active:isValiEmpId,error:inpIndex==2&&!isValiEmpId}"
+      >
         <label>员工编号：</label>
-        <input type="text" v-model="empId" placeholder="4~6位数字"/>
+        <input
+          type="text"
+          v-model="empId"
+          v
+          placeholder="4~6位数字"
+          @blur="valiEmpId"
+          @input="valiEmpId"
+        />
       </div>
-      <div class="input-group mt" @click="inpIndex=3" :class="{active:inpIndex==3}">
+      <div
+        class="input-group mt"
+        @click="inpIndex=3"
+        :class="{active:IsValiPwd,error:inpIndex==3&&!IsValiPwd}"
+      >
         <label>登录密码：</label>
-        <input type="text" v-model="pwd" placeholder="6~15位数字" />
+        <input type="text" v-model="pwd" placeholder="6~15位数字" @blur="valiPwd" @input="valiPwd" />
       </div>
       <div class="check-warp">
         <div @click="savePwd">
@@ -43,8 +64,15 @@
 </template>
 
 <script>
+import service from "../service";
+import { mapMutations } from "vuex";
+import { Toast } from "vant";
 export default {
   name: "login",
+  components: {
+    // eslint-disable-next-line
+    Toast
+  },
   data() {
     return {
       //公司编号
@@ -59,10 +87,36 @@ export default {
       //是否自动登录
       isAutoLogin: true,
       //公司编号验证是否成功
-      isValiComId: false
+      isValiComId: false,
+      //员工编号验证是否成功
+      isValiEmpId: false,
+      //密码验证是否成功
+      IsValiPwd: false
     };
   },
+  mounted() {
+    // 重新进入登录页后取出存储在localstorage中的保存密码赋值给input并验证状态
+    let data = JSON.parse(localStorage.getItem("loginInfo"));
+    if (localStorage.getItem("loginInfo") && !data.isSavePwd) {
+      this.comId = data.comId;
+      this.empId = data.empId;
+      this.pwd = data.pwd;
+      this.isSavePwd = data.isSavePwd;
+    }
+    this.valiComId();
+    this.valiEmpId();
+    this.valiPwd();
+    console.log(localStorage.getItem("isAutoLogin"));
+    if (JSON.parse(localStorage.getItem("isAutoLogin")) === false) {
+      console.log("mother fuck");
+      this.isAutoLogin = false;
+      setTimeout(() => {
+        this.login();
+      }, 2000);
+    }
+  },
   methods: {
+    ...mapMutations(["getUserInfo"]),
     test() {
       console.log(1);
     },
@@ -80,26 +134,80 @@ export default {
       //若自动登录框选中，则保存密码框一定选中，反之亦然
       !this.isAutoLogin ? (this.isSavePwd = false) : (this.isSavePwd = true);
     },
+    //验证函数
+    // eslint-disable-next-line
+    // valiFn(regularEx, typeId, typeIsid) {
+    //   regularEx.test(typeId) ? (typeIsid = true) : (typeIsid = false);
+    //   console.log(regularEx);
+    //   console.log(typeId);
+    //   console.log(typeIsid);
+    // },
     //验证公司编号
     valiComId() {
-      if (/^\d{4,6}$/.test(this.comId)) {
-        this.isValiComId = true;
-      } else {
-        this.isValiComId = false;
-      }
+      /^\d{4,6}$/.test(this.comId)
+        ? (this.isValiComId = true)
+        : (this.isValiComId = false);
+    },
+    //验证员工编号
+    valiEmpId() {
+      /^\d{4,6}$/.test(this.empId)
+        ? (this.isValiEmpId = true)
+        : (this.isValiEmpId = false);
+    },
+    //验证密码
+    valiPwd() {
+      /^\w.{5,16}$/.test(this.pwd)
+        ? (this.IsValiPwd = true)
+        : (this.IsValiPwd = false);
     },
     login() {
-      // console.log(JSON.parse(localStorage.getItem("loginInfo")));
-      if (!this.isSavePwd) {
-        localStorage.setItem(
-          "loginInfo",
-          JSON.stringify({
-            comId: this.comId,
-            empId: this.empId,
-            pwd: this.pwd
-          })
-        );
+      if (!this.comId || !this.empId || !this.pwd) {
+        console.log("用户名或密码不能为空");
+        return;
       }
+      Toast.loading({
+        message: "使劲登录中...",
+        forbidClick: true
+      });
+      service
+        .login({
+          CNO: this.comId,
+          PNO: this.empId,
+          Passwd: this.pwd
+        })
+        .then(result => {
+          console.log(result);
+          if (result.data.code == 1) {
+            //记住密码
+            if (!this.isSavePwd) {
+              localStorage.setItem(
+                "loginInfo",
+                JSON.stringify({
+                  comId: this.comId,
+                  empId: this.empId,
+                  pwd: this.pwd,
+                  isSavePwd: this.isSavePwd
+                })
+              );
+            }
+            if (!this.isAutoLogin) {
+              localStorage.setItem("isAutoLogin", this.isAutoLogin);
+            }
+            //存入vux
+            this.getUserInfo(result.data.user);
+            sessionStorage.setItem(
+              "userInfo",
+              JSON.stringify({
+                user: result.data.user,
+                token: result.data.token
+              })
+            );
+            this.$router.push("/home");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 };
@@ -169,7 +277,6 @@ body,
         height: 40px;
         border: none;
         outline: none;
-        color: $impColOne;
       }
     }
     .error {
@@ -212,7 +319,6 @@ body,
     margin-top: 10px;
     border-radius: 10px;
     font-size: $fsLarge;
-    // font-weight: bold;
     letter-spacing: 5px;
   }
 }
