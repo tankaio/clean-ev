@@ -97,7 +97,7 @@ export default {
   mounted() {
     // 重新进入登录页后取出存储在localstorage中的保存密码赋值给input并验证状态
     let data = JSON.parse(localStorage.getItem("loginInfo"));
-    if (localStorage.getItem("loginInfo") && !data.isSavePwd) {
+    if (data && !data.isSavePwd) {
       this.comId = data.comId;
       this.empId = data.empId;
       this.pwd = data.pwd;
@@ -106,9 +106,7 @@ export default {
     this.valiComId();
     this.valiEmpId();
     this.valiPwd();
-    console.log(localStorage.getItem("isAutoLogin"));
     if (JSON.parse(localStorage.getItem("isAutoLogin")) === false) {
-      console.log("mother fuck");
       this.isAutoLogin = false;
       setTimeout(() => {
         this.login();
@@ -176,7 +174,7 @@ export default {
           Passwd: this.pwd
         })
         .then(result => {
-          console.log(result);
+          console.log("result-login: ",result);
           if (result.data.code == 1) {
             //记住密码
             if (!this.isSavePwd) {
@@ -274,6 +272,7 @@ body,
         margin-left: 15px;
       }
       input {
+        width: 150px;
         height: 40px;
         border: none;
         outline: none;

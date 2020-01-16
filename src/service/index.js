@@ -1,7 +1,7 @@
 import axios from "axios";
 
 axios.interceptors.request.use(function (config) {
-    console.log(JSON.parse(sessionStorage.getItem("userInfo")));
+    console.log("service-config: ",JSON.parse(sessionStorage.getItem("userInfo")));
     // let token = JSON.parse(sessionStorage.getItem("userInfo")).token;
     // if (token) {
     //     axios.defaults.headers.Authorization = "Bearer" + token;
