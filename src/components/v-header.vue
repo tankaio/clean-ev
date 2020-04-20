@@ -20,7 +20,10 @@ export default {
       required: true
     },
     leftTxt: String,
-    isArrow: Boolean,
+    isArrow: {
+      type: Boolean,
+      default: true
+    },
     urlLeft: String,
     urlRight: String
   },
@@ -29,7 +32,7 @@ export default {
       this.urlLeft ? this.$router.push(this.urlLeft) : this.$router.go(-1);
     },
     rightClick() {
-      this.urlRight ? this.$router.push(this.urlRight) : this.$router.go(-1);
+      this.urlRight ? this.$router.push(this.urlRight) : this.$router.go(1);
     }
   }
 };

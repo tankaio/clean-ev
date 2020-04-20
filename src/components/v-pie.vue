@@ -1,7 +1,7 @@
 <template>
   <div class="v-pie">
     <div class="pie" ref="pie"></div>
-    <div class="title">{{title}}</div>
+    <div class="title">{{ title }}</div>
   </div>
 </template>
 
@@ -16,14 +16,8 @@ import "echarts/lib/component/title";
 export default {
   name: "v-pie",
   props: {
-    title: {
-      type: String,
-      required: true
-    },
-    val: {
-      type: Number,
-      // required: true
-    }
+    title: String,
+    val: [String, Number]
   },
   mounted() {
     this.initPie();
@@ -66,8 +60,8 @@ export default {
               }
             },
             data: [
-              { value: 80, name: "80%" },
-              { value: 20, name: "" }
+              { value: this.val, name: this.val + "%" },
+              { value: 100 - this.val, name: "" }
             ]
           }
         ]
@@ -82,8 +76,6 @@ export default {
 
 <style lang="scss" scoped>
 .v-pie {
-  width: 85px;
-  height: 85px;
   .pie {
     width: 85px;
     height: 85px;
@@ -96,4 +88,3 @@ export default {
   }
 }
 </style>
-

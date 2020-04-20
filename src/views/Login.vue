@@ -8,51 +8,26 @@
       <!-- logo -->
       <img src="../assets/logo.jpg" />
       <!-- form -->
-      <div
-        class="input-group"
-        @click="inpIndex=1"
-        :class="{active:isValiComId,error:inpIndex==1&&!isValiComId}"
-      >
+      <div :class="['input-group', isValiComId]" @input="comIdValidate">
         <label>公司编号：</label>
-        <input
-          type="text"
-          v-model="comId"
-          placeholder="4~6位数字"
-          @blur="valiComId"
-          @input="valiComId"
-        />
+        <input type="text" v-model="comId" placeholder="4~6位数字" @blur="comIdBlur" />
       </div>
-      <div
-        class="input-group mt"
-        @click="inpIndex=2"
-        :class="{active:isValiEmpId,error:inpIndex==2&&!isValiEmpId}"
-      >
+      <div :class="['input-group', 'mt', isValiEmpId]" @input="empIdValidate">
         <label>员工编号：</label>
-        <input
-          type="text"
-          v-model="empId"
-          v
-          placeholder="4~6位数字"
-          @blur="valiEmpId"
-          @input="valiEmpId"
-        />
+        <input type="text" v-model="empId" placeholder="4~6位数字" @blur="empIdBlur" />
       </div>
-      <div
-        class="input-group mt"
-        @click="inpIndex=3"
-        :class="{active:IsValiPwd,error:inpIndex==3&&!IsValiPwd}"
-      >
+      <div :class="['input-group', 'mt', isValiPwd]" @input="pwdValidate">
         <label>登录密码：</label>
-        <input type="text" v-model="pwd" placeholder="6~15位数字" @blur="valiPwd" @input="valiPwd" />
+        <input type="text" v-model="pwd" placeholder="6~15位数字" @blur="pwdBlur" />
       </div>
       <div class="check-warp">
         <div @click="savePwd">
-          <i class="iconfont icon-jizhumima" v-if="isSavePwd"></i>
+          <i class="iconfont icon-jizhumima" v-if="!isSavePwd"></i>
           <i class="iconfont icon-checked" v-else></i>
           <span>保存密码</span>
         </div>
         <div @click="autoLogin">
-          <i class="iconfont icon-jizhumima" v-if="isAutoLogin"></i>
+          <i class="iconfont icon-jizhumima" v-if="!isAutoLogin"></i>
           <i class="iconfont icon-checked" v-else></i>
           <span>自动登录</span>
         </div>
@@ -64,15 +39,12 @@
 </template>
 
 <script>
-import service from "../service";
+import { login } from "../api/login";
+import { numValidate, pwdValidate } from "../utils/validate";
 import { mapMutations } from "vuex";
-import { Toast } from "vant";
+import { Notify, Toast } from "vant";
 export default {
   name: "login",
-  components: {
-    // eslint-disable-next-line
-    Toast
-  },
   data() {
     return {
       //公司编号
@@ -81,137 +53,137 @@ export default {
       empId: "",
       //登陆密码
       pwd: "",
-      inpIndex: 1,
       //是否保存密码
-      isSavePwd: true,
+      isSavePwd: false,
       //是否自动登录
-      isAutoLogin: true,
+      isAutoLogin: false,
       //公司编号验证是否成功
-      isValiComId: false,
+      isValiComId: "",
       //员工编号验证是否成功
-      isValiEmpId: false,
+      isValiEmpId: "",
       //密码验证是否成功
-      IsValiPwd: false
+      isValiPwd: false
     };
-  },
-  mounted() {
-    // 重新进入登录页后取出存储在localstorage中的保存密码赋值给input并验证状态
-    let data = JSON.parse(localStorage.getItem("loginInfo"));
-    if (data && !data.isSavePwd) {
-      this.comId = data.comId;
-      this.empId = data.empId;
-      this.pwd = data.pwd;
-      this.isSavePwd = data.isSavePwd;
-    }
-    this.valiComId();
-    this.valiEmpId();
-    this.valiPwd();
-    if (JSON.parse(localStorage.getItem("isAutoLogin")) === false) {
-      this.isAutoLogin = false;
-      setTimeout(() => {
-        this.login();
-      }, 2000);
-    }
   },
   methods: {
     ...mapMutations(["getUserInfo"]),
-    test() {
-      console.log(1);
+    //公司编号验证
+    comIdValidate() {
+      this.isValiComId = numValidate(this.comId) ? "active" : "error";
+    },
+    //员工编号验证
+    empIdValidate() {
+      this.isValiEmpId = numValidate(this.empId) ? "active" : "error";
+    },
+    //密码验证
+    pwdValidate() {
+      this.isValiPwd = pwdValidate(this.pwd) ? "active" : "error";
+    },
+    //公司编号输入框失焦验证
+    comIdBlur() {
+      if (!this.comId) Notify({ background: "#24be5a", message: "公司编号不能为空", duration: 1500 });
+    },
+    //员工编号输入框失焦验证
+    empIdBlur() {
+      if (!this.empId) Notify({ background: "#24be5a", message: "员工编号不能为空", duration: 1500 });
+    },
+    //密码输入框失焦验证
+    pwdBlur() {
+      if (!this.pwd) {
+        Notify({ background: "#24be5a", message: "密码不能为空", duration: 1500 });
+        return;
+      }
+      if (!pwdValidate(this.pwd)) {
+        Notify({ background: "#24be5a", message: "密码至少包含大小字字母，数字和特殊符号中两种", duration: 3000 });
+        return;
+      }
+    },
+    //登录
+    login() {
+      let data = { CNO: this.comId, PNO: this.empId, Passwd: this.pwd };
+      login(data).then(({ data }) => {
+        console.log("response-data:", data);
+        let toast = Toast.loading({
+          message: "登录中...",
+          duration: 0, // 持续展示 toast
+          forbidClick: true
+        });
+        if (data.code === 0) {
+          // 手动清除 Toast
+          toast.clear();
+          Toast.fail(data.msg);
+        } else if (data.code === 1) {
+          // 手动清除 Toast
+          toast.clear();
+          Toast.success(data.msg);
+          this.$router.push({ name: "home", path: "/home" });
+
+          //如果勾选了自动登录则保存登录信息到localStorage
+          if (this.isAutoLogin) {
+            let loginInfo = {
+              comId: this.comId,
+              empId: this.empId,
+              pwd: this.pwd,
+              isSavePwd: true,
+              isAutoLogin: true
+            };
+            localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+          } else if (this.isSavePwd) {
+            //勾选了保存密码同样保存登录信息到localStorage
+            let loginInfo = {
+              comId: this.comId,
+              empId: this.empId,
+              pwd: this.pwd,
+              isSavePwd: true
+            };
+            localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+          }
+
+          //登录后将用户信息和token存到vuex中;并在sessionStorage中存一份(因为页面一刷新vuex中数据就没有了)
+          let userInfo = { user: data.user, token: data.token };
+          sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+          this.getUserInfo(userInfo);
+        }
+      });
     },
     //保存密码
     savePwd() {
-      //点击保存密码框选中与不选中状态取反
+      if (this.isSavePwd && this.isAutoLogin) this.isAutoLogin = false;
       this.isSavePwd = !this.isSavePwd;
-      //若保存密码框没选中，则自动登录框一定不选中（因为只有保存了密码才能自动登录）
-      this.isSavePwd && (this.isAutoLogin = true);
     },
-    //自动登陆
+    //自动登录
     autoLogin() {
-      //点击自动登陆框选中与不选中状态取反
+      !this.isSavePwd && (this.isSavePwd = true);
       this.isAutoLogin = !this.isAutoLogin;
-      //若自动登录框选中，则保存密码框一定选中，反之亦然
-      !this.isAutoLogin ? (this.isSavePwd = false) : (this.isSavePwd = true);
     },
-    //验证函数
-    // eslint-disable-next-line
-    // valiFn(regularEx, typeId, typeIsid) {
-    //   regularEx.test(typeId) ? (typeIsid = true) : (typeIsid = false);
-    //   console.log(regularEx);
-    //   console.log(typeId);
-    //   console.log(typeIsid);
-    // },
-    //验证公司编号
-    valiComId() {
-      /^\d{4,6}$/.test(this.comId)
-        ? (this.isValiComId = true)
-        : (this.isValiComId = false);
-    },
-    //验证员工编号
-    valiEmpId() {
-      /^\d{4,6}$/.test(this.empId)
-        ? (this.isValiEmpId = true)
-        : (this.isValiEmpId = false);
-    },
-    //验证密码
-    valiPwd() {
-      /^\w.{5,16}$/.test(this.pwd)
-        ? (this.IsValiPwd = true)
-        : (this.IsValiPwd = false);
-    },
-    login() {
-      if (!this.comId || !this.empId || !this.pwd) {
-        console.log("用户名或密码不能为空");
-        return;
+    //勾选了保存密码或自动登录后再次进入登录页时页面数据的再赋值
+    viewAssign(loginInfo) {
+      this.comId = loginInfo.comId;
+      this.empId = loginInfo.empId;
+      this.pwd = loginInfo.pwd;
+      if (loginInfo.isAutoLogin) {
+        this.isAutoLogin = loginInfo.isAutoLogin;
+        this.isSavePwd = loginInfo.isSavePwd;
+      } else if (loginInfo.isSavePwd) {
+        this.isSavePwd = loginInfo.isSavePwd;
       }
-      Toast.loading({
-        message: "使劲登录中...",
-        forbidClick: true
-      });
-      service
-        .login({
-          CNO: this.comId,
-          PNO: this.empId,
-          Passwd: this.pwd
-        })
-        .then(result => {
-          console.log("result-login: ",result);
-          if (result.data.code == 1) {
-            //记住密码
-            if (!this.isSavePwd) {
-              localStorage.setItem(
-                "loginInfo",
-                JSON.stringify({
-                  comId: this.comId,
-                  empId: this.empId,
-                  pwd: this.pwd,
-                  isSavePwd: this.isSavePwd
-                })
-              );
-            }
-            if (!this.isAutoLogin) {
-              localStorage.setItem("isAutoLogin", this.isAutoLogin);
-            }
-            //存入vux
-            this.getUserInfo(result.data.user);
-            sessionStorage.setItem(
-              "userInfo",
-              JSON.stringify({
-                user: result.data.user,
-                token: result.data.token
-              })
-            );
-            this.$router.push("/home");
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    }
+  },
+  mounted() {
+    let loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
+    if (loginInfo) {
+      if (loginInfo.isAutoLogin) {
+        this.viewAssign(loginInfo);
+        this.login();
+      } else if (loginInfo.isSavePwd) {
+        this.viewAssign(loginInfo);
+      }
     }
   }
 };
 </script>
 
-<style>
+<style lang="scss">
 html,
 body,
 #app {
@@ -268,6 +240,12 @@ body,
       border-radius: 22.5px;
       overflow: hidden;
       margin-top: 40px;
+      &.error {
+        border: 1px solid $weakColThree;
+      }
+      &.active {
+        border: 1px solid $impColOne;
+      }
       label {
         margin-left: 15px;
       }
@@ -277,12 +255,6 @@ body,
         border: none;
         outline: none;
       }
-    }
-    .error {
-      border: 1px solid $weakColThree;
-    }
-    .active {
-      border: 1px solid $impColOne;
     }
     .mt {
       margin-top: 15px;

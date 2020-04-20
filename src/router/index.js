@@ -6,6 +6,12 @@ import VueRouter from "vue-router";
 //路由懒加载
 const Home = () => import("@/views/Home.vue");
 const Login = () => import("@/views/Login.vue");
+const Notice = () => import("@/views/Notice.vue");
+const NoticeDetails = () => import("@/views/NoticeDetails.vue");
+const ShopVisit = () => import("@/views/ShopVisit.vue");
+const ShopActivity = () => import("@/views/ShopActivity.vue");
+const ShopSign = () => import("@/views/ShopSign.vue");
+const Order = () => import("@/views/Order.vue");
 
 Vue.use(VueRouter);
 
@@ -25,13 +31,42 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
+    component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
   },
   {
     path: "/login",
     name: "login",
     component: Login
+  },
+  {
+    path: "/notice",
+    name: "notice",
+    component: Notice
+  },
+  {
+    path: "/noticedetails/:id",
+    name: "noticedetails",
+    component: NoticeDetails
+  },
+  {
+    path: "/shopvisit",
+    name: "shopvisit",
+    component: ShopVisit
+  },
+  {
+    path: "/shopactivity/:id",
+    name: "shopactivity",
+    component: ShopActivity
+  },
+  {
+    path: "/shopsign/:id",
+    name: "shopsign",
+    component: ShopSign
+  },
+  {
+    path: "/order",
+    name: "order",
+    component: Order
   }
 ];
 

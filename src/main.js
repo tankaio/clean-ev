@@ -4,6 +4,9 @@ import router from "./router";
 import store from "./store";
 import "./assets/fontcss/iconfont.css";
 
+import { Icon } from "vant";
+Vue.use(Icon);
+
 Vue.config.productionTip = false;
 
 new Vue({
