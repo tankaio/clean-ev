@@ -8,7 +8,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    userInfo: "",
+    userInfo: {},
     noticeList: []
   },
   mutations: {
@@ -29,6 +29,12 @@ export default new Vuex.Store({
       let findItem = state.noticeList[findIndex];
       findItem.isRead = true;
       state.noticeList.splice(findIndex, 1, findItem);
+    },
+    updateUserInfo(state, updateUserInfo) {
+      state.userInfo.user = updateUserInfo;
+    },
+    clearAll(state) {
+      state = {};
     }
   },
   actions: {},

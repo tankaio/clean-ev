@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <v-header title="SFA">
-      <i class="iconfont icon-person"></i>
+      <i class="iconfont icon-person" @click="$router.push('/mine')"></i>
     </v-header>
     <div class="pies">
       <div class="pies-title">{{ piesTitle }}</div>

@@ -1,15 +1,24 @@
 <template>
   <div class="v-search">
     <div class="search-icon-wrap">
-      <van-icon name="search" />
+      <van-icon name="search" @click="$emit('search')" />
     </div>
-    <input type="text" class="inp-search" placeholder="点击进行搜索~" />
+    <input
+      type="text"
+      class="inp-search"
+      placeholder="点击进行搜索~"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+      @keydown.enter="$emit('search')"
+    />
     <slot />
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  props: ["value"]
+};
 </script>
 
 <style lang="scss" scoped>

@@ -71,7 +71,7 @@ export default {
     ...mapState("shop", ["shopName"])
   },
   methods: {
-    ...mapMutations("shop", ["getShopName"])
+    ...mapMutations("shop", ["getShopName", "setCurShop"])
   },
   created() {
     this.getShopName(this.$route.params.id);
@@ -79,6 +79,7 @@ export default {
       console.log(res);
       this.salesData = res.data;
     });
+    this.setCurShop(this.$route.params.id);
   }
 };
 </script>

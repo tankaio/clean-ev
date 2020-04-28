@@ -5,6 +5,13 @@
 </template>
 
 <style lang="scss">
+html,
+body,
+#app {
+  height: 100%;
+}
+</style>
+<style lang="scss">
 @import url(./assets/normalize.css);
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;

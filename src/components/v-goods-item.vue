@@ -1,6 +1,6 @@
 <template>
-  <div class="v-goods-item">
-    <img :src="img" />
+  <div class="v-goods-item" @click="$emit('click')">
+    <img :src="src" />
     <div class="goods-wrap">
       <h4>{{ title }}</h4>
       <div class="center-box">
@@ -8,8 +8,10 @@
         <span>规格：{{ packageDimensions }}</span>
       </div>
       <div class="bottom-box">
-        <span>价格：{{ monery }}</span>
-        <span>库存：{{ number }}</span>
+        <span
+          >价格：<i class="price">{{ monery && monery.toFixed(2) }}</i></span
+        >
+        <span v-show="inventoryIsShow">库存：{{ number }}</span>
       </div>
       <div class="refresh-icon"><van-icon name="replay" /></div>
     </div>
@@ -18,7 +20,18 @@
 
 <script>
 export default {
-  props: ["img", "title", "serial", "packageDimensions", "monery", "number"]
+  props: {
+    src: String,
+    title: String,
+    serial: [String, Number],
+    packageDimensions: String,
+    monery: [String, Number],
+    number: [String, Number],
+    inventoryIsShow: {
+      type: Boolean,
+      default: true
+    }
+  }
 };
 </script>
 
@@ -51,6 +64,10 @@ export default {
     }
     .bottom-box {
       margin-top: 15px;
+      span > i {
+        color: $weakColThree;
+        font-size: $fs_16;
+      }
     }
   }
   .refresh-icon {

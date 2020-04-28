@@ -12,6 +12,9 @@ const ShopVisit = () => import("@/views/ShopVisit.vue");
 const ShopActivity = () => import("@/views/ShopActivity.vue");
 const ShopSign = () => import("@/views/ShopSign.vue");
 const Order = () => import("@/views/Order.vue");
+const GoodsSelect = () => import("@/views/GoodsSelect.vue");
+const Cart = () => import("@/views/Cart.vue");
+const Mine = () => import("@/views/Mine.vue");
 
 Vue.use(VueRouter);
 
@@ -67,6 +70,21 @@ const routes = [
     path: "/order",
     name: "order",
     component: Order
+  },
+  {
+    path: "/goodsselect/:id",
+    name: "goodsselect",
+    component: GoodsSelect
+  },
+  {
+    path: "/cart",
+    name: "cart",
+    component: Cart
+  },
+  {
+    path: "/mine",
+    name: "mine",
+    component: Mine
   }
 ];
 

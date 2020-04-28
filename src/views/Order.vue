@@ -1,7 +1,11 @@
 <template>
   <div class="order">
-    <v-header title="下单"><van-icon name="shopping-cart-o"/></v-header>
-    <v-search>
+    <v-header title="下单">
+      <router-link to="/cart">
+        <van-icon name="shopping-cart-o" />
+      </router-link>
+    </v-header>
+    <v-search v-model="value" @search="search">
       <div class="qr-code"><van-icon name="scan" /></div>
     </v-search>
     <ul class="navBar">
@@ -9,29 +13,37 @@
         v-for="(item, index) in navBar"
         :key="index"
         :class="{ active: navAcIndex === index }"
-        @click="navAcIndex = index"
+        @click="navbarClick(index)"
       >
         {{ item }}
       </li>
     </ul>
     <div class="bread-wrap">
-      <span class="fl">1670/3590</span>
+      <span class="fl">?/{{ totalCount }}</span>
       <div class="fr">
         <span class="bread">洗护/食品/宝洁</span>
-        <van-icon name="filter-o" />
+        <van-icon name="filter-o" @click="show = true" />
       </div>
     </div>
+    <van-popup v-model="show" position="right" :style="{ height: '100%' }">
+      <div class="tags">
+        <van-tag type="success" class="ml" @click="xihuClick">洗护</van-tag>
+        <van-tag type="success" class="ml" @click="shipinClick">食品</van-tag>
+        <van-tag type="success" class="ml" @click="baojieClick">宝洁</van-tag>
+      </div>
+    </van-popup>
     <div class="line-1"></div>
     <van-list v-model="loading" :finished="finished" finished-text="没有更多了" :immediate-check="false" @load="onLoad">
       <v-goods-item
-        v-for="item in goodsList"
+        v-for="item in goodsListLocal"
         :key="item.id"
-        :img="item.img"
+        :src="item.img"
         :title="item.title"
         :serial="item.serial"
         :packageDimensions="item.packageDimensions"
         :monery="item.monery"
         :number="item.number"
+        @click="$router.push(`/goodsselect/${item.id}`)"
       ></v-goods-item>
     </van-list>
   </div>
@@ -44,9 +56,11 @@ import VGoodsItem from "../components/v-goods-item";
 import { getGoods } from "../api/goods";
 import { mapState, mapMutations } from "vuex";
 import Vue from "vue";
-import { List } from "vant";
+import { List, Popup, Tag } from "vant";
 
-Vue.use(List);
+Vue.use(List)
+  .use(Popup)
+  .use(Tag);
 export default {
   components: {
     VHeader,
@@ -55,37 +69,99 @@ export default {
   },
   data() {
     return {
-      navBar: ["促销", "全部", "PUKU-N", "PUKU-Y", "PUKU-Z"],
+      navBar: ["全部", "促销", "PUKU-N", "PUKU-Y", "PUKU-Z"],
       navAcIndex: 0,
       loading: false,
       finished: false,
-      page: 1
+      page: 1,
+      show: false,
+      totalCount: 0,
+      goodsListLocal: [],
+      type: "",
+      value: ""
     };
   },
   computed: {
-    ...mapState("goods", ["goodsList"])
+    ...mapState("goods", ["goodsList", "salesList", "typeGoodsList"])
   },
   methods: {
-    ...mapMutations("goods", ["setGoodsList", "appendGoodsList"]),
-    getGoodsList() {
-      return new Promise(resolve => {
-        getGoods(this.page, 15).then(res => {
-          console.log("goods:", res);
-          this.appendGoodsList(res.data);
-          this.page++;
-          resolve(res.data);
-        });
+    ...mapMutations("goods", ["setGoodsList", "appendGoodsList", "onSalesList", "setTypeGoodsList"]),
+    search() {
+      getGoods(1, 15, this.value).then(res => {
+        console.log("search_goodsList:", res);
       });
     },
     onLoad() {
-      this.getGoodsList().then(resolve => {
+      getGoods(this.page, 15).then(res => {
+        console.log("onLoad_res:", res);
+        this.appendGoodsList(res.data);
+        this.page++;
+        if (this.navAcIndex === 1) {
+          this.onSalesList();
+          this.goodsListLocal = this.salesList;
+          console.log("sales:", this.goodsListLocal);
+        }
+        if (this.type === "洗护") {
+          this.setTypeGoodsList("洗护");
+          this.goodsListLocal = this.typeGoodsList;
+          console.log("xihu_onLoad:", this.goodsListLocal);
+        }
+        if (this.type === "食品") {
+          this.setTypeGoodsList("食品");
+          this.goodsListLocal = this.typeGoodsList;
+          console.log("shipin_onLoad:", this.goodsListLocal);
+        }
+        if (this.type === "宝洁") {
+          this.setTypeGoodsList("宝洁");
+          this.goodsListLocal = this.typeGoodsList;
+          console.log("baojie_onLoad:", this.goodsListLocal);
+        }
         this.loading = false;
-        if (resolve.length < 1) this.finished = true;
+        if (res.data.length < 1) this.finished = true;
       });
+    },
+    navbarClick(index) {
+      this.navAcIndex = index;
+      if (index === 0) {
+        this.goodsListLocal = this.goodsList;
+        console.log("all:", this.goodsListLocal);
+      }
+      if (index === 1) {
+        this.onSalesList();
+        this.goodsListLocal = this.salesList;
+        console.log("sales:", this.goodsListLocal);
+      }
+    },
+    xihuClick() {
+      this.type = "洗护";
+      this.setTypeGoodsList("洗护");
+      this.goodsListLocal = this.typeGoodsList;
+      console.log("xihu:", this.goodsListLocal);
+      this.show = false;
+    },
+    shipinClick() {
+      this.type = "食品";
+      this.setTypeGoodsList("食品");
+      this.goodsListLocal = this.typeGoodsList;
+      console.log("shipin:", this.goodsListLocal);
+      this.show = false;
+    },
+    baojieClick() {
+      this.type = "宝洁";
+      this.setTypeGoodsList("宝洁");
+      this.goodsListLocal = this.typeGoodsList;
+      console.log("baojie:", this.goodsListLocal);
+      this.show = false;
     }
   },
   created() {
-    this.getGoodsList();
+    getGoods(this.page, 15).then(res => {
+      console.log("created_res:", res);
+      this.setGoodsList(res.data);
+      this.goodsListLocal = this.goodsList;
+      this.totalCount = res.headers["x-total-count"];
+      this.page++;
+    });
   }
 };
 </script>
@@ -95,6 +171,7 @@ export default {
   .van-icon-shopping-cart-o {
     font-size: $fs_16;
     vertical-align: middle;
+    color: $white;
   }
   .van-icon-scan {
     font-size: 28px;
@@ -161,6 +238,16 @@ export default {
     height: 1px;
     background-color: $weakColTwo;
     margin: 0 15px;
+  }
+  .tags {
+    width: 150px;
+    padding: 10px;
+    .ml {
+      margin-left: 10px;
+      &:first-child {
+        margin-left: 0;
+      }
+    }
   }
   .van-icon-filter-o {
     font-size: 18px;

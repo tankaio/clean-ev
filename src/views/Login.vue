@@ -178,17 +178,20 @@ export default {
       } else if (loginInfo.isSavePwd) {
         this.viewAssign(loginInfo);
       }
+    } else {
+      this.comId = this.$route.query.CNO;
+      this.empId = this.$route.query.PNO;
     }
   }
 };
 </script>
 
 <style lang="scss">
-html,
-body,
-#app {
-  height: 100%;
-}
+// html,
+// body,
+// #app {
+//   height: 100%;
+// }
 </style>
 <style lang="scss" scoped>
 .login {

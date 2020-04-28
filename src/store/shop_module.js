@@ -2,7 +2,8 @@ export default {
   namespaced: true,
   state: {
     shopList: [],
-    shopName: ""
+    shopName: "",
+    curShop: {}
   },
   mutations: {
     setShopList(state, shopList) {
@@ -17,6 +18,9 @@ export default {
     getShopName(state, id) {
       let shop = state.shopList.find(elem => elem.id == id);
       state.shopName = shop.name;
+    },
+    setCurShop(state, id) {
+      state.curShop = state.shopList.find(item => item.id == id);
     }
   }
 };

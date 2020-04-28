@@ -4,7 +4,7 @@
       <i class="iconfont icon-backarrow" v-if="isArrow"></i>
       <span v-else>{{ leftTxt }}</span>
     </div>
-    <div>{{ title }}</div>
+    <div class="center-wrap">{{ title }}</div>
     <div class="rightwrap" @click="rightClick" :urlRight="urlRight">
       <slot></slot>
     </div>
