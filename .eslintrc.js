@@ -13,6 +13,7 @@ module.exports = {
     parser: "babel-eslint"
   },
   globals: {
-    qq: "writable"
+    qq: "writable",
+    console: "off"
   }
 };
